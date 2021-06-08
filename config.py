@@ -776,3 +776,6 @@ class DefaultConfig(ImmutableConfig):
 
     # Account recovery mode
     ACCOUNT_RECOVERY_MODE = False
+
+    # Allows "/" in repository names
+    FEATURE_EXTENDED_REPOSITORY_NAMES = False
