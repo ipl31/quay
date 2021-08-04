@@ -381,6 +381,12 @@ CONFIG_SCHEMA = {
             "x-example": "Database",
             "enum": ["Database", "LDAP", "JWT", "Keystone", "OIDC", "AppToken"],
         },
+        "FORCE_OIDC_USERNAME_TOKEN": {
+            "type": "bool",
+            "description": "Always use the oauth/oidc token for determining username even if " 
+            + "user endpoint exists. Defaults to False."
+            "x-example": False,
+        }
         "SUPER_USERS": {
             "type": "array",
             "description": "Quay usernames of those users to be granted superuser privileges",

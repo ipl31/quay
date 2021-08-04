@@ -55,6 +55,7 @@ class OIDCLoginService(OAuthService):
         self._id = key_name[0 : key_name.find("_")].lower()
         self._http_client = client or config.get("HTTPCLIENT")
         self._mailing = config.get("FEATURE_MAILING", False)
+        self._oidc_username_token = config.get("FORCE_OIDC_USERNAME_TOKEN", False)
         self._public_key_cache = _PublicKeyCache(self, 1, PUBLIC_KEY_CACHE_TTL)
 
     def service_id(self):
@@ -171,9 +172,10 @@ class OIDCLoginService(OAuthService):
             logger.exception("Could not load public key during OIDC decode: %s", pke)
             raise OAuthLoginException("Could find public OIDC key")
 
-        # If there is a user endpoint, use it to retrieve the user's information. Otherwise, we use
+        # If there is a user endpoint and force token usage is not enabled 
+        # use the endpoint to retrieve the user's information. Otherwise, we use
         # the decoded ID token.
-        if self.user_endpoint():
+        if self.user_endpoint() and not self._oidc_username_token:
             # Retrieve the user information.
             try:
                 user_info = self.get_user_info(http_client, access_token)

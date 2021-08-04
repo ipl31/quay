@@ -226,6 +226,7 @@ class DefaultConfig(ImmutableConfig):
 
     # Authentication
     AUTHENTICATION_TYPE = "Database"
+    FORCE_OIDC_USERNAME_TOKEN = False
 
     # Build logs
     BUILDLOGS_REDIS = {"host": "localhost"}
