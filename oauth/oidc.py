@@ -182,6 +182,8 @@ class OIDCLoginService(OAuthService):
         else:
             user_info = decoded_id_token
 
+        # Ken: Hack to force using token instead of endpoint
+        user_info = decoded_id_token
         # Verify subs.
         if user_info["sub"] != decoded_id_token["sub"]:
             logger.debug(
@@ -191,6 +193,8 @@ class OIDCLoginService(OAuthService):
             )
             raise OAuthLoginException("Mismatch in `sub` returned by OIDC user info endpoint")
 
+        logger.debug(f"id_token: {decoded_id_token}")
+        logger.debug(f"user_info: {user_info}")
         # Check if we have a verified email address.
         if self.config.get("VERIFIED_EMAIL_CLAIM_NAME"):
             email_address = user_info.get(self.config["VERIFIED_EMAIL_CLAIM_NAME"])
@@ -204,7 +208,6 @@ class OIDCLoginService(OAuthService):
                     "A verified email address is required to login with this service"
                 )
 
-        # Check for a preferred username.
         if self.config.get("PREFERRED_USERNAME_CLAIM_NAME"):
             lusername = user_info.get(self.config["PREFERRED_USERNAME_CLAIM_NAME"])
         else:
@@ -213,12 +216,16 @@ class OIDCLoginService(OAuthService):
                 # Note: Active Directory provides `unique_name` and `upn`.
                 # https://docs.microsoft.com/en-us/azure/active-directory/develop/v1-id-and-access-tokens
                 lusername = user_info.get("unique_name", user_info.get("upn"))
+                logger.debug(f"lusername 2: {lusername}")
+                
 
         if lusername is None:
             lusername = user_info["sub"]
 
         if lusername.find("@") >= 0:
             lusername = lusername[0 : lusername.find("@")]
+
+        logger.debug(f"Username will be: {lusername}")
 
         return decoded_id_token["sub"], lusername, email_address
 
